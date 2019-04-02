@@ -13,11 +13,16 @@
       currentUnits: "js-units"
     },
     afterUpdate: function(newPercentage) {
-      console.log("It has been updated!");
+      uiBinding.wave.updateWaveHeight(newPercentage);
+      console.log("It has been updated!", newPercentage);
     }
   };
 
   document.addEventListener("DOMContentLoaded", () => {
+    uiBinding.wave.setup("js-waves");
+    uiBinding.logging.setup("js-log");
+
+    uiBinding.logging.enableAmountOptions();
     new ProgressTracker(options);
   });
 })();

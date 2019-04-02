@@ -1,11 +1,13 @@
 const uiBinding = (function() {
   //subModules
   const wave = (function() {
-    const setup = function() {
-      console.log("setup");
+    this.waveElement = null;
+    const setup = function(waveClass) {
+      this.waveElement = document.querySelector(`.${waveClass}`);
     };
-    const updateWaveHeight = function() {
-      console.log("updateWaveHeight");
+    const updateWaveHeight = function(newPercentage) {
+      if (newPercentage > 100) newPercentage = 100;
+      this.waveElement.style.transform = `translateY(${100 - newPercentage}%)`;
     };
 
     return {
@@ -15,12 +17,16 @@ const uiBinding = (function() {
   })();
 
   const logging = (function() {
-    const setup = function() {
-      console.log("setup");
+    this.addButton; //binnenin logging kunnen we addbutton aanspreken
+
+    const setup = function(buttonClass) {
+      this.addButton = document.querySelector(`.${buttonClass}`);
     };
 
     const enableAmountOptions = function() {
-      console.log("enableAmountOptions");
+      this.addButton.addEventListener("click", function() {
+        console.log(this.dataset);
+      });
     };
 
     return {

@@ -3,7 +3,10 @@ class ProgressTracker {
     console.log(options);
     this.options = options;
 
-    this.currentProgress = 0;
+    this.percentageValue = 0;
+    this.currentProgress = [];
+    //dataAccess[this.options.mode].getProgressOfToday() || [];
+    this.timerId = null;
 
     this.percentageRatio = 100 / this.options.dailyGoal;
 
@@ -25,6 +28,17 @@ class ProgressTracker {
 
     this.showUserOptions();
 
+    this.restoreProgress();
+    this.listenToNewLogging();
+  }
+  restoreProgress() {
+    this.currentProgress = dataAccess[this.options.mode].getProgressByDate(
+      new Date()
+    );
+    for (const p of this.currentProgress) {
+      this.updateProgress(p);
+    }
+
     // units: "ml",
     // dailyGoal: 2000,
     // mode: "local",
@@ -40,6 +54,30 @@ class ProgressTracker {
     // }
   }
 
+  updateProgress(newLogging = ["00:00", 0]) {
+    if (this.timerId) {
+      clearInterval(this.timerId);
+    }
+    //this.currentProgress.push(newLogging);
+    this.showTimeStamp(newLogging[0]);
+    const oldProgress = Number(this.percentage.innerText),
+      newProgress = oldProgress + newLogging[1] * this.percentageRatio;
+
+    this.percentageValue = newProgress;
+
+    let v = oldProgress;
+    this.timerId = setInterval(() => {
+      this.percentage.innerText = v;
+      const animateWave = this.options.afterUpdate.bind(this, v);
+      requestAnimationFrame(animateWave);
+      if (v >= newProgress) {
+        clearInterval(this.timerId);
+      }
+      v++;
+    }, 32);
+    //When finished, pass the new progress
+  }
+
   showUserOptions() {
     for (const g of this.currentGoalHolders) {
       g.innerHTML = this.options.dailyGoal;
@@ -48,5 +86,25 @@ class ProgressTracker {
     for (const u of this.currentUnitHolders) {
       u.innerHTML = this.options.units;
     }
+  }
+
+  showTimeStamp(timeStamp) {
+    this.timeStampHolder.innerHTML += `<li class="c-time-stamp">${timeStamp}</li>`;
+  }
+  listenToNewLogging() {
+    this.addButton.addEventListener("click", () => {
+      console.log("Dataset is", this.addButton.dataset.amount);
+      const now = new Date();
+      const time = `${now
+          .getHours()
+          .toString()
+          .padStart(2, "0")} : ${now
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}`,
+        amount = this.addButton.dataset.amount;
+      this.updateProgress([time, amount]);
+      // Todo: dataAccess[this.options.mode].saveLogging([time, amount]);
+    });
   }
 }

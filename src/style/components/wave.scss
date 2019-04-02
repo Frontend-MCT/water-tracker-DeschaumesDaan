@@ -8,8 +8,8 @@
   background: $alpha-color;
 
   will-change: transform;
-  transition: 900ms ease-in-out transform; //  1000ms/60fps = 16ms = perfecte 60fps
-  transform: translateY(50%);
+  transition: 100ms ease-in-out transform; //  1000ms/60fps = 16ms = perfecte 60fps
+  transform: translateY(100%);
 }
 .c-wave {
   position: absolute;
